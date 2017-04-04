@@ -1,14 +1,8 @@
 <?php
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
 
 require '../vendor/autoload.php';
+require "../php/Controller.php";
 
-$app = new \Slim\App;
+$controller = new Controller();
+$controller->route();
 
-$app->get('/', function (Request $request, Response $response) {
-
-    $params = $request->getQueryParams();
-    return $response->withJson($params);
-});
-$app->run();
