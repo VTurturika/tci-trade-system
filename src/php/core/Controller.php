@@ -1,10 +1,10 @@
 <?php
 
-require "api/controllers/CategoryController.php";
-require "api/controllers/CharacteristicController.php";
-require "api/controllers/CounterpartyController.php";
-require "api/controllers/ProductController.php";
-require "api/controllers/TransactionController.php";
+//require "api/controllers/CategoryController.php";
+//require "api/controllers/CharacteristicController.php";
+//require "api/controllers/CounterpartyController.php";
+//require "api/controllers/ProductController.php";
+//require "api/controllers/TransactionController.php";
 
 class Controller {
 

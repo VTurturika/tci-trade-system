@@ -7,9 +7,11 @@ use Interop\Container\ContainerInterface;
 class CounterpartyController {
 
     protected $container;
+    private $model;
 
     public function __construct(ContainerInterface $container) {
         $this->container = $container;
+        $this->model = new CounterpartyModel();
     }
 
     public function get(Request $request, Response $response, $args) {

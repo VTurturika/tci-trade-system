@@ -7,9 +7,11 @@ use Interop\Container\ContainerInterface;
 class TransactionController {
 
     protected $container;
+    private $model;
 
     public function __construct(ContainerInterface $container) {
         $this->container = $container;
+        $this->model = new TransactionModel();
     }
 
     public function get(Request $request, Response $response) {
