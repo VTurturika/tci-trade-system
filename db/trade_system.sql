@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS trade_system.Product_Characteristic
 (
     product INT NOT NULL,
     characteristic INT,
+    measure VARCHAR(50),
     value_bool TINYINT(1),
     value_int INT,
     value_double DOUBLE,
@@ -15,7 +16,7 @@ CREATE TABLE IF NOT EXISTS trade_system.Product_Characteristic
 
 CREATE TABLE IF NOT EXISTS trade_system.Product
 (
-    id INT NOT NULL UNIQUE,
+    id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(50),
     description VARCHAR(500),
     category INT,
@@ -32,7 +33,7 @@ CREATE TABLE IF NOT EXISTS trade_system.Product
 
 CREATE TABLE IF NOT EXISTS trade_system.Transaction
 (
-    id INT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     total_count INT,
     type TINYINT(1),
     total_price DECIMAL(18, 2),
@@ -45,7 +46,7 @@ CREATE TABLE IF NOT EXISTS trade_system.Transaction
 CREATE TABLE IF NOT EXISTS trade_system.Instance_Transaction
 (
     instance INT NOT NULL,
-    transaction INT,
+    transaction INT NOT NULL,
     counterparty INT,
     type TINYINT(1),
     selling_count INT,
@@ -54,15 +55,16 @@ CREATE TABLE IF NOT EXISTS trade_system.Instance_Transaction
 
 CREATE TABLE IF NOT EXISTS trade_system.Characteristic
 (
-    id INT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     type VARCHAR(10),
     name VARCHAR(30),
+    measurements VARCHAR(500),
     PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS trade_system.Category
 (
-    id INT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     name VARCHAR(50),
     parent INT,
     PRIMARY KEY(id)
@@ -70,10 +72,11 @@ CREATE TABLE IF NOT EXISTS trade_system.Category
 
 CREATE TABLE IF NOT EXISTS trade_system.Instance
 (
-    id INT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     current_count INT,
     buying_count INT,
     buying_price DECIMAL(18, 2),
+    currency VARCHAR(20),
     product INT NOT NULL,
     storage VARCHAR(20),
     PRIMARY KEY(id)
@@ -81,7 +84,7 @@ CREATE TABLE IF NOT EXISTS trade_system.Instance
 
 CREATE TABLE IF NOT EXISTS trade_system.Counterparty
 (
-    id INT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(50),
     type TINYINT(1),
     firstname VARCHAR(50),
