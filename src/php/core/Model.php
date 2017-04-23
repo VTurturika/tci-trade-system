@@ -16,7 +16,7 @@ class Model  {
             "host"      => "localhost",
             "database"  => "trade_system",
             "username"  => "tci",
-            "password"  => getenv("DB_PASSWORD"),
+            "password"  => "GrQHkGLqSGmVKxMk",
             "charset"   => "utf8"
         );
 
