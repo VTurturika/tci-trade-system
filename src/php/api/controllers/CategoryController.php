@@ -15,26 +15,30 @@ class CategoryController {
     }
 
     public function get(Request $request, Response $response, $args) {
-
-        $response->getBody()->write("get: Not implemented yet");
-        return $response;
+        $parsedBody = $request->getParsedBody();
+        $responseResult = $this->model->get($parsedBody, $args["id"] ?? null);
+        Logger::logWithMsg("res ", $responseResult);
+        return $response->withJson($responseResult);
     }
 
     public function create(Request $request, Response $response) {
-
-        $response->getBody()->write("create: Not implemented yet");
-        return $response;
+        $parsedBody = $request->getParsedBody();
+        $responseResult = $this->model->create($parsedBody, $args);
+        Logger::logWithMsg("res ", $responseResult);
+        return $response->withJson($responseResult);
     }
 
     public function modify(Request $request, Response $response, $args) {
-
-        $response->getBody()->write("modify: Not implemented yet");
-        return $response;
+        $parsedBody = $request->getParsedBody();
+        $responseResult = $this->model->modify($parsedBody, $args);
+        Logger::logWithMsg("res ", $responseResult);
+        return $response->withJson($responseResult);
     }
 
     public function delete(Request $request, Response $response, $args) {
-
-        $response->getBody()->write("delete: Not implemented yet");
-        return $response;
+        $parsedBody = $request->getParsedBody();
+        $responseResult = $this->model->delete($parsedBody, $args["id"] ?? null);
+        Logger::logWithMsg("res ", $responseResult);
+        return $response->withJson($responseResult);
     }
 }
