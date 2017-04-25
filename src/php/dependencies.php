@@ -4,6 +4,8 @@ require "core/Controller.php";
 require "core/Model.php";
 require "core/View.php";
 
+require "core/Logger.php";
+
 require "api/controllers/CategoryController.php";
 require "api/controllers/CharacteristicController.php";
 require "api/controllers/CounterpartyController.php";

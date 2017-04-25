@@ -16,8 +16,9 @@ class ProductController {
 
     public function get(Request $request, Response $response, $args) {
 
-        $response->getBody()->write("get: Not implemented yet");
-        return $response;
+        $parsedBody = $request->getParsedBody();
+        $responseResult = $this->model->get($parsedBody, $args["id"] ?? null);
+        return $response->withJson($responseResult);
     }
 
     public function create(Request $request, Response $response) {
