@@ -10,12 +10,12 @@ INSERT INTO `Category` (name, parent) VALUES
 UNLOCK TABLES;
 
 LOCK TABLES `Characteristic` WRITE;
-INSERT INTO `Characteristic` (type, name, measurements) VALUES
+INSERT INTO `Characteristic` (type, name, measure) VALUES
   ('float','діагональ','дм'),
   ('boolean','тв2 ',''),
   ('integer','кількість ядер','шт'),
-  ('float','висота','м,см'),
-  ('float','діаметр','м,см');
+  ('float','висота','см'),
+  ('float','діаметр','см');
 UNLOCK TABLES;
 
 LOCK TABLES `Characteristic_Category` WRITE;
@@ -38,26 +38,38 @@ INSERT INTO `Product`(title, description, category, article, barcode, consignmen
   ('Smart TV',NULL,4,'fewrer','56564','4','Samsung','345s','78','fucking cool',NULL),
   ('Regular TV',NULL,4,'567','hthtrhtr','333','China Noname','first','so-so','FX',NULL),
   ('Горщик для квітів',NULL,5,'2324frfr','lflgflg','4','China nigers','3','',NULL,NULL),
-  ('Граблі','',5,'455','544','3','Ukraine','nimbulus','2000','qwerty',NULL);
+  ('Граблі','',5,'455','544','3','Ukraine','nimbulus','2000','qwerty',NULL),
+  ('Iphone', null, 3, null, null, null, 'Apple', '4s', null, null, null),
+  ('Xiaomi', null, 3, null, null, null, 'MI', 'Redmi Note', null, null, null),
+  ('Nokia', null, 3, null, null, null, 'Nokia', 'X2-00', null, null, null);
 UNLOCK TABLES;
 
 LOCK TABLES `Product_Characteristic` WRITE;
-INSERT INTO `Product_Characteristic`(product, characteristic, type, value, measure) VALUES
-  (1,1,'float','6.95','дм'),
-  (1,3,'integer','5','шт'),
-  (1,4,'float','0,25','м'),
-  (2,1,'float','5','дм'),
-  (2,3,'float','8','шт'),
-  (2,4,'float','0.22','м'),
-  (3,1,'float','50','дм'),
-  (3,2,'boolean','true',NULL),
-  (3,4,'float','100','см'),
-  (4,1,'float','40','дм'),
-  (4,2,'boolean','false',NULL),
-  (4,4,'float','90','см'),
-  (5,4,'float','30','см'),
-  (5,5,'float','20','см'),
-  (6,4,'float','100','см');
+INSERT INTO `Product_Characteristic`(product, characteristic, type, value) VALUES
+  (1,1,'float','6.95'),
+  (1,3,'integer','5'),
+  (1,4,'float','25'),
+  (2,1,'float','5'),
+  (2,3,'float','8'),
+  (2,4,'float','22'),
+  (3,1,'float','50'),
+  (3,2,'boolean','true'),
+  (3,4,'float','100'),
+  (4,1,'float','40'),
+  (4,2,'boolean','false'),
+  (4,4,'float','90'),
+  (5,4,'float','30'),
+  (5,5,'float','20'),
+  (6,4,'float','100'),
+  (7, 4, 'float', '15'),
+  (7, 3, 'integer', '2'),
+  (8, 1, 'float', '5.5'),
+  (7, 1, 'float', '6'),
+  (8, 3, 'integer', '16'),
+  (8, 4, 'float', '25'),
+  (9, 1, 'float', '2.1'),
+  (9, 3, 'integer', '1'),
+  (9, 4, 'float', '12');
 UNLOCK TABLES;
 
 LOCK TABLES `Counterparty` WRITE;

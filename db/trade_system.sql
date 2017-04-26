@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS Characteristic
   id           INT NOT NULL AUTO_INCREMENT,
   type         VARCHAR(10),
   name         VARCHAR(30),
-  measurements VARCHAR(500),
+  measure      VARCHAR(50),
   PRIMARY KEY (id)
 );
 
@@ -50,8 +50,7 @@ CREATE TABLE IF NOT EXISTS Product_Characteristic
   product        INT NOT NULL,
   characteristic INT,
   type           VARCHAR(10),
-  value          VARCHAR(100),
-  measure        VARCHAR(50)
+  value          VARCHAR(100)
 );
 
 CREATE TABLE IF NOT EXISTS Instance
