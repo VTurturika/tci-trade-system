@@ -49,7 +49,6 @@ CREATE TABLE IF NOT EXISTS Product_Characteristic
 (
   product        INT NOT NULL,
   characteristic INT,
-  type           VARCHAR(10),
   value          VARCHAR(100)
 );
 

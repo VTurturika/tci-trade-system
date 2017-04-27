@@ -45,31 +45,31 @@ INSERT INTO `Product`(title, description, category, article, barcode, consignmen
 UNLOCK TABLES;
 
 LOCK TABLES `Product_Characteristic` WRITE;
-INSERT INTO `Product_Characteristic`(product, characteristic, type, value) VALUES
-  (1,1,'float','6.95'),
-  (1,3,'integer','5'),
-  (1,4,'float','25'),
-  (2,1,'float','5'),
-  (2,3,'float','8'),
-  (2,4,'float','22'),
-  (3,1,'float','50'),
-  (3,2,'boolean','true'),
-  (3,4,'float','100'),
-  (4,1,'float','40'),
-  (4,2,'boolean','false'),
-  (4,4,'float','90'),
-  (5,4,'float','30'),
-  (5,5,'float','20'),
-  (6,4,'float','100'),
-  (7, 4, 'float', '15'),
-  (7, 3, 'integer', '2'),
-  (8, 1, 'float', '5.5'),
-  (7, 1, 'float', '6'),
-  (8, 3, 'integer', '16'),
-  (8, 4, 'float', '25'),
-  (9, 1, 'float', '2.1'),
-  (9, 3, 'integer', '1'),
-  (9, 4, 'float', '12');
+INSERT INTO `Product_Characteristic`(product, characteristic, value) VALUES
+  (1,1,'6.95'),
+  (1,3,'5'),
+  (1,4,'25'),
+  (2,1,'5'),
+  (2,3,'8'),
+  (2,4,'22'),
+  (3,1,'50'),
+  (3,2,'true'),
+  (3,4,'100'),
+  (4,1,'40'),
+  (4,2,'false'),
+  (4,4,'90'),
+  (5,4,'30'),
+  (5,5,'20'),
+  (6,4,'100'),
+  (7, 4,'15'),
+  (7, 3,'2'),
+  (8, 1,'5.5'),
+  (7, 1,'6'),
+  (8, 3,'16'),
+  (8, 4,'25'),
+  (9, 1,'2.1'),
+  (9, 3,'1'),
+  (9, 4,'12');
 UNLOCK TABLES;
 
 LOCK TABLES `Counterparty` WRITE;
