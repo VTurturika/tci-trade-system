@@ -27,4 +27,11 @@ class ProductController {
         $responseResult = $this->model->create($parsedBody);
         return $response->withJson($responseResult);
     }
+
+    public function modify(Request $request, Response $response, $args) {
+
+        $parsedBody = $request->getParsedBody();
+        $responseResult = $this->model->modify($parsedBody, $args["id"]);
+        return $response->withJson($responseResult);
+    }
 }

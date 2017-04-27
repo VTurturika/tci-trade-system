@@ -75,7 +75,6 @@ class ProductModel extends Model {
                     ));
 
                     array_push($data["characteristics"], array(
-                        "product" => $id,
                         "characteristic" => $c["id"],
                         "value" => $c["value"],
                         "type" => $c["type"],
@@ -86,6 +85,61 @@ class ProductModel extends Model {
             return $data;
         }
         else return array("msg" => "error: title, category, article required");
+    }
+
+    public function modify($params, $id) {
+
+        if($params == null) $params = array();
+
+        $data = array();
+
+        if(array_key_exists("title", $params))
+            $data["title"] = $params["title"];
+        if(array_key_exists("category", $params))
+            $data["category"] = $params["category"];
+        if(array_key_exists("article", $params))
+            $data["article"] = $params["article"];
+        if(array_key_exists("description", $params))
+            $data["description"] = $params["description"];
+        if(array_key_exists("barcode", $params))
+            $data["barcode"] = $params["barcode"];
+        if(array_key_exists("consignment", $params))
+            $data["consignment"] = $params["consignment"];
+        if(array_key_exists("manufacturer", $params))
+            $data["manufacturer"] = $params["manufacturer"];
+        if(array_key_exists("model", $params))
+            $data["model"] = $params["model"];
+        if(array_key_exists("series", $params))
+            $data["series"] = $params["series"];
+        if(array_key_exists("specification", $params))
+            $data["specification"] = $params["specification"];
+        if(array_key_exists("comment", $params))
+            $data["comment"] = $params["comment"];
+
+        $this->db->table("Product")->where("id", "=", $id)->update($data);
+        $this->db->table("Product_Characteristic")->where("product", "=", $id)->delete();
+        $data["id"] = $id;
+
+        if(array_key_exists("characteristics", $params) && count($params["characteristics"]) > 0) {
+
+            $data["characteristics"] = array();
+            foreach ($params["characteristics"] as $c) {
+
+                $this->db->table("Product_Characteristic")->insert(array(
+                    "product" => $id,
+                    "characteristic" => $c["id"],
+                    "value" => $c["value"]
+                ));
+
+                array_push($data["characteristics"], array(
+                    "characteristic" => $c["id"],
+                    "value" => $c["value"],
+                    "type" => $c["type"],
+                    "measure" => $c["measure"]
+                ));
+            }
+        }
+        return $data;
     }
 
     private function getFilteredProducts($params) {

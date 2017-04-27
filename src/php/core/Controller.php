@@ -40,6 +40,7 @@ class Controller {
         //product routes
         $this->app->post("/api/product/get[/{id}]", \ProductController::class . ":get");
         $this->app->post("/api/product/create", \ProductController::class . ":create");
+        $this->app->post("/api/product/modify/{id}", \ProductController::class . ":modify");
 
         //transaction routes
         $this->app->post("/api/transaction/get", \TransactionController::class . ":get");
