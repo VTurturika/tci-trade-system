@@ -23,7 +23,9 @@ class ProductController {
 
     public function create(Request $request, Response $response) {
 
-        $response->getBody()->write("create: Not implemented yet");
+        $parsedBody = $request->getParsedBody();
+        $responseResult = $this->model->create($parsedBody);
+        $response->withJson($responseResult);
         return $response;
     }
 }

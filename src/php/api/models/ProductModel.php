@@ -25,6 +25,11 @@ class ProductModel extends Model {
         return ($id == null) ? $this->getFilteredProducts($params) : $this->getSpecifiedProduct($id);
     }
 
+    public function create($params) {
+
+        return array();
+    }
+
     private function getFilteredProducts($params) {
 
         if(array_key_exists("characteristics", $params) && count($params["characteristics"]) > 0) {
