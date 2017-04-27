@@ -88,7 +88,7 @@ class ProductModel extends Model {
                 $i++;
             }
 
-            if (strpos($featuresJoin, "f1.product = f2.product") !== false) {
+            if (strpos($featuresJoin, ") f1 ") !== false) {
                 $featuresJoin .= ") products ON pc.product = products.ids";
             }
             else $featuresJoin = "";
