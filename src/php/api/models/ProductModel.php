@@ -27,7 +27,65 @@ class ProductModel extends Model {
 
     public function create($params) {
 
-        return array();
+        if($params == null) $params = array();
+        Logger::logWithMsg("params", $params);
+
+        if (array_key_exists("title", $params) &&
+            array_key_exists("category", $params) &&
+            array_key_exists("article", $params)
+        ) {
+
+            $data = array();
+            $data["title"] = $params["title"];
+            $data["category"] = $params["category"];
+            $data["article"] = $params["article"];
+
+            if(array_key_exists("description", $params))
+                $data["description"] = $params["description"];
+            if(array_key_exists("barcode", $params))
+                $data["barcode"] = $params["barcode"];
+            if(array_key_exists("consignment", $params))
+                $data["consignment"] = $params["consignment"];
+            if(array_key_exists("manufacturer", $params))
+                $data["manufacturer"] = $params["manufacturer"];
+            if(array_key_exists("model", $params))
+                $data["model"] = $params["model"];
+            if(array_key_exists("series", $params))
+                $data["series"] = $params["series"];
+            if(array_key_exists("specification", $params))
+                $data["specification"] = $params["specification"];
+            if(array_key_exists("comment", $params))
+                $data["comment"] = $params["comment"];
+
+            //todo check if category exist
+            //todo for each characteristic check if it exist
+
+            $id = $this->db->table("Product")->insert($data);
+            $data["id"] = $id;
+
+            if(array_key_exists("characteristics", $params) && count($params["characteristics"]) > 0) {
+
+                $data["characteristics"] = array();
+                foreach ($params["characteristics"] as $c) {
+
+                    $this->db->table("Product_Characteristic")->insert(array(
+                        "product" => $id,
+                        "characteristic" => $c["id"],
+                        "value" => $c["value"]
+                    ));
+
+                    array_push($data["characteristics"], array(
+                        "product" => $id,
+                        "characteristic" => $c["id"],
+                        "value" => $c["value"],
+                        "type" => $c["type"],
+                        "measure" => $c["measure"]
+                    ));
+                }
+            }
+            return $data;
+        }
+        else return array("msg" => "error: title, category, article required");
     }
 
     private function getFilteredProducts($params) {

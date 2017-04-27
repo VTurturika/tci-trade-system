@@ -25,7 +25,6 @@ class ProductController {
 
         $parsedBody = $request->getParsedBody();
         $responseResult = $this->model->create($parsedBody);
-        $response->withJson($responseResult);
-        return $response;
+        return $response->withJson($responseResult);
     }
 }
