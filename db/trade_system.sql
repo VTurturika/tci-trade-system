@@ -73,6 +73,9 @@ CREATE TABLE IF NOT EXISTS Transaction
   document       VARCHAR(256),
   preparing_date DATE,
   conducted_date DATE,
+  balans_before  DECIMAL(18, 2),
+  balans_after   DECIMAL(18, 2),
+  global_index     INT,
   PRIMARY KEY (id)
 );
 
@@ -101,6 +104,13 @@ CREATE TABLE IF NOT EXISTS Instance_Transaction
   type          TINYINT(1),
   selling_count INT,
   selling_price DECIMAL(18, 2)
+);
+
+CREATE TABLE IF NOT EXISTS Data
+(
+  balans DECIMAL(18, 2),
+  password VARCHAR(100),
+  transaction_index INT
 );
 
 # Create FKs
