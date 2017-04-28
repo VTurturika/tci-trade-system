@@ -22,6 +22,13 @@ class TransactionController {
 
     public function create(Request $request, Response $response) {
 
+        $parsedBody = $request->getParsedBody();
+        $responseResult = $this->model->create($parsedBody);
+        return $response->withJson($responseResult);
+    }
+
+    public function conduct(Request $request, Response $response, $args) {
+
         $response->getBody()->write("create: Not implemented yet");
         return $response;
     }
