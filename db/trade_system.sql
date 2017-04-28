@@ -55,9 +55,8 @@ CREATE TABLE IF NOT EXISTS Product_Characteristic
 CREATE TABLE IF NOT EXISTS Instance
 (
   id            INT NOT NULL AUTO_INCREMENT,
-  current_count INT,
-  buying_count  INT,
-  buying_price  DECIMAL(18, 2),
+  count         INT,
+  price         DECIMAL(18, 2),
   currency      VARCHAR(20),
   product       INT NOT NULL,
   storage       VARCHAR(20),
@@ -103,7 +102,8 @@ CREATE TABLE IF NOT EXISTS Instance_Transaction
   counterparty  INT,
   type          TINYINT(1),
   selling_count INT,
-  selling_price DECIMAL(18, 2)
+  selling_price DECIMAL(18, 2),
+  buying_count  INT
 );
 
 CREATE TABLE IF NOT EXISTS Data

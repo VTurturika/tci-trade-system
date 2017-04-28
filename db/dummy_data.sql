@@ -81,14 +81,14 @@ UNLOCK TABLES;
 
 
 LOCK TABLES `Instance` WRITE;
-INSERT INTO `Instance`(product, current_count, buying_count, buying_price, currency, storage) VALUES
-  (1,4,5,15000.00,'UAH','2'),
-  (1,1,10,13000.00,'UAH','1'),
-  (2,8,10,3000.00,'UAH','2'),
-  (3,3,5,20000.00,'UAH','2'),
-  (4,2,10,10000.00,'UAH','1'),
-  (5,90,100,35.00,'UAH','1'),
-  (6,5,10,100.00,'UAH','2');
+INSERT INTO `Instance`(product, count, price, currency, storage) VALUES
+  (1,4,15000.00,'UAH','2'),
+  (1,1,13000.00,'UAH','1'),
+  (2,8,3000.00,'UAH','2'),
+  (3,3,20000.00,'UAH','2'),
+  (4,2,10000.00,'UAH','1'),
+  (5,90,35.00,'UAH','1'),
+  (6,5,100.00,'UAH','2');
 UNLOCK TABLES;
 
 LOCK TABLES `Transaction` WRITE;
@@ -98,22 +98,22 @@ INSERT INTO `Transaction`(total_count, type, total_price,document, preparing_dat
 UNLOCK TABLES;
 
 LOCK TABLES `Instance_Transaction` WRITE;
-INSERT INTO `Instance_Transaction`(instance, transaction, counterparty,
-                                   type, selling_count, selling_price) VALUES
-  (1,1,1,0,NULL,NULL),
-  (2,1,1,0,NULL,NULL),
-  (3,1,1,0,NULL,NULL),
-  (4,1,1,0,NULL,NULL),
-  (5,1,1,0,NULL,NULL),
-  (6,1,1,0,NULL,NULL),
-  (7,1,1,0,NULL,NULL),
-  (1,2,2,1,1,16000.00),
-  (2,2,2,1,9,12000.00),
-  (3,2,2,1,2,3500.00),
-  (4,2,2,1,2,20000.00),
-  (5,2,2,1,8,12000.00),
-  (6,2,2,1,10,40.00),
-  (7,2,2,1,5,105.00);
+INSERT INTO `Instance_Transaction`(instance, transaction, counterparty, type,
+                                   buying_count, selling_count, selling_price) VALUES
+  (1,1,1,0,5,NULL,NULL),
+  (2,1,1,0,10,NULL,NULL),
+  (3,1,1,0,10,NULL,NULL),
+  (4,1,1,0,5,NULL,NULL),
+  (5,1,1,0,10,NULL,NULL),
+  (6,1,1,0,100,NULL,NULL),
+  (7,1,1,0,100,NULL,NULL),
+  (1,2,2,1,NULL,1,16000.00),
+  (2,2,2,1,NULL,9,12000.00),
+  (3,2,2,1,NULL,2,3500.00),
+  (4,2,2,1,NULL,2,20000.00),
+  (5,2,2,1,NULL,8,12000.00),
+  (6,2,2,1,NULL,10,40.00),
+  (7,2,2,1,NULL,5,105.00);
 UNLOCK TABLES;
 
 LOCK TABLES `Data` WRITE;
