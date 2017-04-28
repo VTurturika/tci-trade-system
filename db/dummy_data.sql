@@ -92,7 +92,7 @@ INSERT INTO `Instance`(product, current_count, buying_count, buying_price, curre
 UNLOCK TABLES;
 
 LOCK TABLES `Transaction` WRITE;
-INSERT INTO `Transaction`(total_count, type, total_price,document, preparing_date, conducted_date, balans_before, balans_after) VALUES
+INSERT INTO `Transaction`(total_count, type, total_price,document, preparing_date, conducted_date, balance_before, balance_after) VALUES
   (7,0,439500.00,'накладна',NULL,'2017-04-23', 0, 0),
   (7,1,267925.00,'чесне слово',NULL,'2017-04-24', 0, 0);
 UNLOCK TABLES;
@@ -117,6 +117,6 @@ INSERT INTO `Instance_Transaction`(instance, transaction, counterparty,
 UNLOCK TABLES;
 
 LOCK TABLES `Data` WRITE;
-INSERT INTO `Data`(balans, password, transaction_index) VALUES
+INSERT INTO `Data`(balance, password, transaction_index) VALUES
   (0, '', 0);
 UNLOCK TABLES;
