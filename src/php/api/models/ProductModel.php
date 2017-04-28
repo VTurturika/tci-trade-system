@@ -5,7 +5,7 @@ class ProductModel extends Model {
     private $select =
         "SELECT pc.product, p.title, p.category, p.article, p.barcode, p.consignment, p.manufacturer, "
         . "p.model, p.series, p.specification, pc.characteristic, c.name, c.type, c.measure, pc.value, "
-        . "it.instance, i.current_count AS count, i.buying_count, i.buying_price, i.currency, "
+        . "it.instance, i.count, i.price, i.currency, "
         . "t.conducted_date AS date, it.counterparty, ct.title AS counterparty_title "
         . "FROM Product_Characteristic pc";
 
@@ -257,13 +257,13 @@ class ProductModel extends Model {
         if(array_key_exists("price", $params)) {
 
             if($params["price"]["from"] == null && $params["price"]["to"] != null) { //buying_price <= to
-               $this->instanceJoin .= "AND i.buying_price <= " . floatval($params["price"]["to"]) . " ";
+               $this->instanceJoin .= "AND i.price <= " . floatval($params["price"]["to"]) . " ";
             }
             else if ($params["price"]["from"] != null && $params["price"]["to"] == null) { //buying_price >= from
-                $this->instanceJoin .= "AND i.buying_price >= " . floatval($params["price"]["from"]) . " ";
+                $this->instanceJoin .= "AND i.price >= " . floatval($params["price"]["from"]) . " ";
             }
             else if ($params["price"]["from"] != null && $params["price"]["to"] != null) {
-                $this->instanceJoin .= "AND i.buying_price BETWEEN "
+                $this->instanceJoin .= "AND i.price BETWEEN "
                     . floatval($params["price"]["from"]) . " AND "
                     . floatval($params["price"]["to"]) . " ";
             }
@@ -272,13 +272,13 @@ class ProductModel extends Model {
 
 
             if($params["count"]["from"] == null && $params["count"]["to"] != null) { //current_count <= to
-                $this->instanceJoin .= "AND i.current_count <= " . floatval($params["count"]["to"]) . " ";
+                $this->instanceJoin .= "AND i.count <= " . floatval($params["count"]["to"]) . " ";
             }
             else if ($params["count"]["from"] != null && $params["count"]["to"] == null) { //buying_price >= from
-                $this->instanceJoin .= "AND i.current_count >= " . floatval($params["count"]["from"]) . " ";
+                $this->instanceJoin .= "AND i.count >= " . floatval($params["count"]["from"]) . " ";
             }
             else if ($params["count"]["from"] != null && $params["count"]["to"] != null) {
-                $this->instanceJoin .= "AND i.current_count BETWEEN " . floatval($params["count"]["from"])
+                $this->instanceJoin .= "AND i.count BETWEEN " . floatval($params["count"]["from"])
                     . " AND " . floatval($params["count"]["to"]) . " ";
             }
         }
@@ -385,8 +385,7 @@ class ProductModel extends Model {
                 array_push( $result[ $row->product ]["instances"], array(
                     "id" => $row->instance,
                     "count" => $row->count,
-                    "buying_count" => $row->buying_count,
-                    "buying_price" => $row->buying_price,
+                    "price" => $row->price,
                     "currency" => $row->currency,
                     "date" => $row->date,
                     "counterparty" => array(

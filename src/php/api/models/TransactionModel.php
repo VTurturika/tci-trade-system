@@ -37,27 +37,34 @@ class TransactionModel extends Model {
 
             foreach ($params["instances"] as $i) {
 
+                if($isSelling && array_key_exists("id", $i[""]))
+
                 $instance = $this->db->table("Instance")
                     ->select("*")
                     ->where("product", "=", $i["product"])
-                    ->where("buying_price", "=", $i["price"])
+                    ->where("price", "=", $i["price"])
                     ->get();
 
+                $count = $i["count"];
                 if(count($instance) == 0) {
 
                     $instance = array(
                         "product" => $i["product"],
-                        "buying_price" => $i["price"],
-                        "buying_count" => $i["count"],
-                        "current_count" => $i["count"],
+                        "price" => $i["price"],
+                        "count" => $i["count"],
                         "currency" => $i["currency"],
                         "storage" => $i["storage"]
                     );
                     $instance["id"] = $this->db->table("Instance")->insert($instance);
                     $instanceId = $instance["id"];
                 }
+                else if( !$isSelling ) {
+                    $instance = $instance[0];
+                    $instanceId = $instance->id;
+                    $this->db->query("UPDATE Instance SET count = count + $count ".
+                                     "WHERE id=$instanceId");
+                }
                 else {
-                    Logger::log($instance);
                     $instance = $instance[0];
                     $instanceId = $instance->id;
                 }
@@ -68,13 +75,14 @@ class TransactionModel extends Model {
                     "counterparty" => $params["counterparty"],
                     "type" => $isSelling ? 1 : 0,
                     "selling_price" =>  $isSelling ? $i["price"] : null,
-                    "selling_count" => $isSelling ? $i["count"] : null
+                    "selling_count" => $isSelling ? $i["count"] : null,
+                    "buying_count" => $isSelling ? null : $i["count"]
                 );
-                $count = $i["count"];
+
                 $this->db->table("Instance_Transaction")->insert($instanceTransaction);
                 if($isSelling) {
                     //todo add check negative current_count
-                    $this->db->query("UPDATE Instance SET current_count = current_count - $count " .
+                    $this->db->query("UPDATE Instance SET count = count - $count " .
                                      "WHERE id=$instanceId;");
                 }
                 $transaction["total_count"]++;
