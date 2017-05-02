@@ -20,10 +20,17 @@ class TransactionController {
         return $response;
     }
 
-    public function create(Request $request, Response $response) {
+    public function buy(Request $request, Response $response) {
 
         $parsedBody = $request->getParsedBody();
-        $responseResult = $this->model->create($parsedBody);
+        $responseResult = $this->model->buy($parsedBody);
+        return $response->withJson($responseResult);
+    }
+
+    public function sell(Request $request, Response $response) {
+
+        $parsedBody = $request->getParsedBody();
+        $responseResult = $this->model->sell($parsedBody);
         return $response->withJson($responseResult);
     }
 
