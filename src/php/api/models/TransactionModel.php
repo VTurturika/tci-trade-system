@@ -83,7 +83,6 @@ class TransactionModel extends Model {
                     ? $globalData->transaction_index + 1
                     : $globalData->transaction_index
             ));
-            $transaction["counterparty"] = $params["counterparty"];
             $transaction["id"] = intval($transactionId);
 
             return $this->generateJson($transaction);
@@ -146,12 +145,48 @@ class TransactionModel extends Model {
                     ? $globalData->transaction_index + 1
                     : $globalData->transaction_index
             ));
-            $transaction["counterparty"] = $params["counterparty"];
             $transaction["id"] = intval($transactionId);
 
             return $this->generateJson($transaction);
         }
         else return array("msg" => "type, document, date, is_conducted, counterparty, instances are required");
+    }
+
+    public function conduct($params, $args) {
+
+        if($params == null) $params = array();
+        if($args == null) $args = array();
+
+        Logger::logWithMsg("Request body", $params);
+        Logger::logWithMsg("Arguments", $args);
+
+        if(array_key_exists("date", $params) && array_key_exists("id", $args)) {
+
+            $globalData = $this->db->table("Data")->select("*")->get()[0];
+            $transaction = array(
+                "conducted_date" => $params["date"],
+                "index" => $globalData->transaction_index + 1
+            );
+
+            $this->db->table("Transaction")->where("id", "=", $args["id"])->update($transaction);
+            $this->db->table("Data")->update(array("transaction_index" => $globalData->transaction_index + 1 ));
+
+            $transactionFromDb = $this->db->table("Transaction")
+                ->select("*")
+                ->where("id", "=", $args["id"])
+                ->get()[0];
+
+            $transaction["id"] = intval($transactionFromDb->id);
+            $transaction["type"] = $transactionFromDb->type;
+            $transaction["document"] = $transactionFromDb->document;
+            $transaction["preparing_date"] = $transactionFromDb->preparing_date;
+            $transaction["total_count"] = $transactionFromDb->total_count;
+            $transaction["total_price"] = $transactionFromDb->total_price;
+            $transaction["balance_before"] = $transactionFromDb->balance_before;
+            $transaction["balance_after"] = $transactionFromDb->balance_after;
+            return $this->generateJson($transaction);
+        }
+        else return array("msg" => "date and id are required");
     }
 
     private function generateJson($transaction) {
@@ -174,6 +209,7 @@ class TransactionModel extends Model {
                     "id" => $row->product,
                     "instances" => array()
                 );
+                $transaction["counterparty"] = $row->counterparty;
             }
 
             if(!array_key_exists($row->instance, $transaction["products"][$row->product]["instances"])) {
