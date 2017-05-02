@@ -30,6 +30,9 @@ class TransactionModel extends Model {
             $transaction = $this->generateJson($transaction);
             array_push($result["transactions"], $transaction);
         }
+
+        $result["balance_before"] = $transactionsFromDb[0]->balance_before;
+        $result["balance_after"] = $transactionsFromDb[ count($transactionsFromDb) - 1 ]->balance_after;
         return $result;
     }
 
