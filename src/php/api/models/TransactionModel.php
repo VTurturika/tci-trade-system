@@ -2,13 +2,12 @@
 
 class TransactionModel extends Model {
 
-    public function create($params) {
+    public function buy($params) {
 
         if($params == null) $params = array();
         Logger::logWithMsg("Request body", $params);
 
-        if (array_key_exists("type", $params) &&
-            array_key_exists("document", $params) &&
+        if (array_key_exists("document", $params) &&
             array_key_exists("date", $params) &&
             array_key_exists("is_conducted", $params) &&
             array_key_exists("counterparty", $params) &&
@@ -16,14 +15,10 @@ class TransactionModel extends Model {
             count($params["instances"]) > 0
         ) {
             $isConducted = boolval($params["is_conducted"]);
-            $isSelling = boolval($params["type"]);
-
-            Logger::logWithMsg("isConducted", $isConducted);
-            Logger::logWithMsg("isSelling", $isSelling);
 
             $globalData = $this->db->table("Data")->select("*")->get()[0];
             $transaction = array(
-                "type" => $params["type"] == "true" ? 1 : 0,
+                "type" => 0,
                 "total_count" => 0,
                 "total_price" => 0.0,
                 "document" => $params["document"],
@@ -36,8 +31,6 @@ class TransactionModel extends Model {
             $transactionId = $this->db->table("Transaction")->insert($transaction);
 
             foreach ($params["instances"] as $i) {
-
-                if($isSelling && array_key_exists("id", $i[""]))
 
                 $instance = $this->db->table("Instance")
                     ->select("*")
@@ -58,40 +51,30 @@ class TransactionModel extends Model {
                     $instance["id"] = $this->db->table("Instance")->insert($instance);
                     $instanceId = $instance["id"];
                 }
-                else if( !$isSelling ) {
-                    $instance = $instance[0];
-                    $instanceId = $instance->id;
-                    $this->db->query("UPDATE Instance SET count = count + $count ".
-                                     "WHERE id=$instanceId");
-                }
                 else {
                     $instance = $instance[0];
                     $instanceId = $instance->id;
+                    $this->db->query("UPDATE Instance SET count = count + $count ".
+                        "WHERE id=$instanceId");
                 }
 
                 $instanceTransaction = array(
                     "instance" => $instanceId,
                     "transaction" => $transactionId,
                     "counterparty" => $params["counterparty"],
-                    "type" => $isSelling ? 1 : 0,
-                    "selling_price" =>  $isSelling ? $i["price"] : null,
-                    "selling_count" => $isSelling ? $i["count"] : null,
-                    "buying_count" => $isSelling ? null : $i["count"]
+                    "type" => 0,
+                    "selling_price" => null,
+                    "selling_count" => null,
+                    "buying_count" => $i["count"]
                 );
-
                 $this->db->table("Instance_Transaction")->insert($instanceTransaction);
-                if($isSelling) {
-                    //todo add check negative current_count
-                    $this->db->query("UPDATE Instance SET count = count - $count " .
-                                     "WHERE id=$instanceId;");
-                }
+
                 $transaction["total_count"]++;
                 $transaction["total_price"] += $i["count"] * $i["price"];
             }
 
             //todo check negative balance
-            $transaction["balance_after"] = $globalData->balance +
-                $isSelling ? +$transaction["total_price"] : -$transaction["total_price"];
+            $transaction["balance_after"] = $globalData->balance - $transaction["total_price"];
 
             $this->db->table("Transaction")->where("id", "=", $transactionId)->update($transaction);
             $this->db->table("Data")->update(array(
@@ -100,9 +83,123 @@ class TransactionModel extends Model {
                     ? $globalData->transaction_index + 1
                     : $globalData->transaction_index
             ));
+            $transaction["counterparty"] = $params["counterparty"];
+            $transaction["id"] = intval($transactionId);
 
-            return $transaction;
+            return $this->generateJson($transaction);
         }
         else return array("msg" => "type, document, date, is_conducted, counterparty, instances are required");
+    }
+
+    public function sell($params) {
+
+        if($params == null) $params = array();
+        Logger::logWithMsg("Request body", $params);
+
+        if (array_key_exists("document", $params) &&
+            array_key_exists("date", $params) &&
+            array_key_exists("is_conducted", $params) &&
+            array_key_exists("counterparty", $params) &&
+            array_key_exists("instances", $params) &&
+            count($params["instances"]) > 0
+        ) {
+            $isConducted = boolval($params["is_conducted"]);
+
+            $globalData = $this->db->table("Data")->select("*")->get()[0];
+            $transaction = array(
+                "type" => 1,
+                "total_count" => 0,
+                "total_price" => 0.0,
+                "document" => $params["document"],
+                "preparing_date" => $isConducted ? null : $params["date"],
+                "conducted_date" => $isConducted ? $params["date"] : null,
+                "balance_before" => floatval($globalData->balance),
+                "balance_after" => 0,
+                "index" => $isConducted ? $globalData->transaction_index + 1 : null
+            );
+            $transactionId = $this->db->table("Transaction")->insert($transaction);
+            foreach ($params["instances"] as $i) {
+
+                $count = $i["count"];
+                $id = $i["id"];
+                $instanceTransaction = array(
+                    "instance" => $i["id"],
+                    "transaction" => $transactionId,
+                    "counterparty" => $params["counterparty"],
+                    "type" => 1,
+                    "selling_price" => $i["price"],
+                    "selling_count" => $i["count"],
+                    "buying_count" => null
+                );
+                $this->db->table("Instance_Transaction")->insert($instanceTransaction);
+                $this->db->query("UPDATE Instance SET count = count - $count WHERE id = $id;");
+
+                $transaction["total_count"]++;
+                $transaction["total_price"] += $i["count"] * $i["price"];
+            }
+            $transaction["balance_after"] = $globalData->balance + $transaction["total_price"];
+
+            $this->db->table("Transaction")->where("id", "=", $transactionId)->update($transaction);
+            $this->db->table("Data")->update(array(
+                "balance" => $transaction["balance_after"],
+                "transaction_index" => $isConducted
+                    ? $globalData->transaction_index + 1
+                    : $globalData->transaction_index
+            ));
+            $transaction["counterparty"] = $params["counterparty"];
+            $transaction["id"] = intval($transactionId);
+
+            return $this->generateJson($transaction);
+        }
+        else return array("msg" => "type, document, date, is_conducted, counterparty, instances are required");
+    }
+
+    private function generateJson($transaction) {
+
+        Logger::logWithMsg("transaction", $transaction);
+        $transaction["transaction_index"] = $transaction["index"];
+        unset($transaction["index"]);
+        $transaction["products"] = array();
+
+        $products = $this->db->query("SELECT * FROM Instance i JOIN Instance_Transaction it " .
+                                     "ON i.id = it.instance AND it.transaction = " . $transaction["id"])->get();
+
+        Logger::logWithMsg("products", $products);
+
+        foreach ($products as $row) {
+
+            if(!array_key_exists($row->product, $transaction["products"])) {
+
+                $transaction["products"][$row->product] = array(
+                    "id" => $row->product,
+                    "instances" => array()
+                );
+            }
+
+            if(!array_key_exists($row->instance, $transaction["products"][$row->product]["instances"])) {
+
+                $transaction["products"][$row->product]["instances"][$row->instance] = array(
+                    "id" => $row->instance,
+                    "count" => $row->count,
+                    "price" => $row->price,
+                    "currency" => $row->currency,
+                    "storage" => $row->storage
+                );
+            }
+        }
+
+        $transaction["products"] = array_values($transaction["products"]);
+        foreach ($transaction["products"] as $key=>$p) {
+            $result = array();
+            foreach ($p["instances"] as $i) {
+                array_push($result, $i);
+            }
+            Logger::logWithMsg("Result", $result);
+            $transaction["products"][$key]["instances"] = $result;
+        }
+
+        Logger::logWithMsg("transaction", $transaction);
+
+        return $transaction;
     }
 }

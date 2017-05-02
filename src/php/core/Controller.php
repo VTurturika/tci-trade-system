@@ -44,7 +44,8 @@ class Controller {
 
         //transaction routes
         $this->app->post("/api/transaction/get", \TransactionController::class . ":get");
-        $this->app->post("/api/transaction/create", \TransactionController::class . ":create");
+        $this->app->post("/api/transaction/buy", \TransactionController::class . ":buy");
+        $this->app->post("/api/transaction/sell", \TransactionController::class . ":sell");
         $this->app->post("/api/transaction/conduct/{id}", \TransactionController::class . ":conduct");
 
         $this->app->run();
