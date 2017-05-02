@@ -16,8 +16,9 @@ class TransactionController {
 
     public function get(Request $request, Response $response) {
 
-        $response->getBody()->write("get: Not implemented yet");
-        return $response;
+        $parsedBody = $request->getParsedBody();
+        $responseResult = $this->model->get($parsedBody);
+        return $response->withJson($responseResult);
     }
 
     public function buy(Request $request, Response $response) {

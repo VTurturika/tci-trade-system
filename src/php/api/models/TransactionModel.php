@@ -2,6 +2,37 @@
 
 class TransactionModel extends Model {
 
+    public function get($params) {
+
+        if($params == null) $params = array();
+        Logger::logWithMsg("Request body", $params);
+
+        $result = array(
+            "balance_before" => 0.0,
+            "balance_after" => 0.0,
+            "transactions" => array()
+        );
+        $transactionsFromDb = $this->db->table("Transaction")->select("*")->orderBy("index", "DESC")->get();
+        foreach ($transactionsFromDb as $row) {
+
+            $transaction = array(
+                "id" => $row->id,
+                "type" => $row->type,
+                "document" => $row->document,
+                "preparing_date" => $row->preparing_date,
+                "conducted_date" => $row->conducted_date,
+                "balance_before" => $row->balance_before,
+                "balance_after" => $row->balance_after,
+                "index" => $row->index,
+                "total_count" => $row->total_count,
+                "total_price" => $row->total_price,
+            );
+            $transaction = $this->generateJson($transaction);
+            array_push($result["transactions"], $transaction);
+        }
+        return $result;
+    }
+
     public function buy($params) {
 
         if($params == null) $params = array();
