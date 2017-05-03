@@ -7,32 +7,140 @@ class TransactionModel extends Model {
         if($params == null) $params = array();
         Logger::logWithMsg("Request body", $params);
 
+        $select = "SELECT t.id, t.type, t.document, t.preparing_date, t.conducted_date, t.balance_before, " .
+            "t.`index` as transaction_index, t.total_count, t.total_price, t.balance_after, " .
+            "p.id as product, p.title, p.article, " .
+            "i.id as instance, i.price, i.currency, i.storage, " .
+            "it.buying_count, it.selling_count, it.selling_price, it.counterparty " .
+            "FROM Instance_Transaction it";
+
+        $instanceJoin = "JOIN Instance i ON it.instance = i.id ";
+        if(array_key_exists("currency", $params)) {
+
+            $currency = $params["currency"];
+            $instanceJoin .= "AND i.currency = '$currency' ";
+        }
+
+        $transactionJoin = "JOIN Transaction t ON it.transaction = t.id ";
+        if(array_key_exists("date", $params) &&
+           array_key_exists("from", $params["date"]) &&
+           array_key_exists("to", $params["date"])
+        ) {
+            $from = $params["date"]["from"];
+            $to = $params["date"]["to"];
+            $transactionJoin .= "AND t.conducted_date BETWEEN '$from' AND '$to' ";
+        }
+        if(array_key_exists("price", $params) &&
+           array_key_exists("from", $params["price"]) &&
+           array_key_exists("to", $params["price"])
+        ) {
+            $from = floatval($params["price"]["from"]);
+            $to = floatval($params["price"]["to"]);
+            $transactionJoin .= "AND t.total_price BETWEEN $from AND $to ";
+        }
+        if(array_key_exists("is_conducted", $params)) {
+            $isConducted = boolval($params["is_conducted"]);
+            $transactionJoin .= "AND t.conducted_date " . $isConducted ? " = " : " != " . "NULL ";
+        }
+
+        $productJoin = "JOIN Product p ON i.product = p.id ";
+        if(array_key_exists("products", $params) && count($params["products"]) > 0) {
+
+            $specifiedProducts = "JOIN (SELECT id FROM Instance WHERE ";
+            for( $i=0; $i < count($params["products"]); $i++ ) {
+
+                $p = $params["products"][$i];
+                $specifiedProducts .= ($i == 0) ? " product = $p " : "OR product = $p ";
+            }
+
+            $specifiedProducts .= ") pi on pi.id = it.instance ";
+
+            $productJoin .= $specifiedProducts;
+        }
+
+        $where = "WHERE true ";
+        if(array_key_exists("type", $params)) {
+
+            $type = $params["type"];
+            $where .= "AND type = $type ";
+        }
+        if(array_key_exists("counterparty", $params)) {
+
+            $counterparty = intval($params["counterparty"]);
+            $where .= "AND counterparty = $counterparty ";
+        }
+
+        $fullQuery = "$select $instanceJoin $transactionJoin $productJoin $where ".
+            "ORDER BY transaction_index DESC;";
+        Logger::logWithMsg("fullQuery", $fullQuery);
+
+        $dbResults = $this->db->query($fullQuery)->get();
         $result = array(
             "balance_before" => 0.0,
             "balance_after" => 0.0,
             "transactions" => array()
         );
-        $transactionsFromDb = $this->db->table("Transaction")->select("*")->orderBy("index", "DESC")->get();
-        foreach ($transactionsFromDb as $row) {
 
-            $transaction = array(
-                "id" => $row->id,
-                "type" => $row->type,
-                "document" => $row->document,
-                "preparing_date" => $row->preparing_date,
-                "conducted_date" => $row->conducted_date,
-                "balance_before" => $row->balance_before,
-                "balance_after" => $row->balance_after,
-                "index" => $row->index,
-                "total_count" => $row->total_count,
-                "total_price" => $row->total_price,
-            );
-            $transaction = $this->generateJson($transaction);
-            array_push($result["transactions"], $transaction);
+        foreach ($dbResults as $t) {
+
+            if(!array_key_exists($t->id, $result["transactions"])) {
+
+                $result["transactions"][$t->id] = array(
+                    "id" => intval($t->id),
+                    "type" => $t->type,
+                    "document" => $t->document,
+                    "preparing_date" => $t->preparing_date,
+                    "conducted_date" => $t->conducted_date,
+                    "balance_before" => floatval($t->balance_before),
+                    "balance_after" => floatval($t->balance_after),
+                    "transaction_index" => intval($t->transaction_index),
+                    "counterparty" => "",
+                    "total_count" => intval($t->total_count),
+                    "total_price" => floatval($t->total_price),
+                    "products" => array()
+                );
+            }
+
+            if (!array_key_exists($t->product, $result["transactions"][$t->id]["products"])
+            ) {
+
+                $result["transactions"][$t->id]["products"][$t->product] = array(
+                    "id" => intval($t->product),
+                    "title" => $t->title,
+                    "article" => $t->article,
+                    "instances" => array()
+                );
+            }
+
+            if (!array_key_exists($t->instance,
+                $result["transactions"][$t->id]["products"][$t->product]["instances"])
+            ) {
+
+                $result["transactions"][$t->id]["products"][$t->product]["instances"][$t->instance] = array(
+                    "id" => intval($t->instance),
+                    "count" => $t->type == 0 ? intval($t->buying_count) : intval($t->selling_count),
+                    "price" => $t->type == 0 ? floatval($t->price) : floatval($t->selling_price),
+                    "currency" => $t->currency,
+                    "storage" => $t->storage
+                );
+                $result["transactions"][$t->id]["counterparty"] = intval($t->counterparty);
+            }
         }
 
-        $result["balance_before"] = $transactionsFromDb[0]->balance_before;
-        $result["balance_after"] = $transactionsFromDb[ count($transactionsFromDb) - 1 ]->balance_after;
+        $result["transactions"] = array_values($result["transactions"]);
+        foreach ($result["transactions"] as $transaction=>$t) {
+
+            $result["transactions"][$transaction]["products"] =
+                array_values($result["transactions"][$transaction]["products"]);
+            foreach ($result["transactions"][$transaction]["products"] as $product=>$p) {
+                $result["transactions"][$transaction]["products"][$product]["instances"] =
+                    array_values($result["transactions"][$transaction]["products"][$product]["instances"]);
+            }
+        }
+
+        $result["balance_before"] = $result["transactions"][count($result["transactions"]) - 1]["balance_before"];
+        $result["balance_after"] = $result["transactions"][0]["balance_after"];
+
         return $result;
     }
 
