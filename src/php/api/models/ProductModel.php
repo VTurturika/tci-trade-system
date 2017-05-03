@@ -82,6 +82,13 @@ class ProductModel extends Model {
                     ));
                 }
             }
+            else {
+                $this->db->table("Product_Characteristic")->insert(array(
+                    "product" => $id,
+                    "characteristic" => 1,
+                    "value" => 1
+                ));
+            }
             return $data;
         }
         else return array("msg" => "error: title, category, article required");
@@ -320,7 +327,7 @@ class ProductModel extends Model {
             . "$this->characteristicJoin $this->productJoin $this->instanceJoin "
             . "$this->instanceTransactionJoin $this->transactionJoin $this->counterpartyJoin";
 
-        //Logger::logWithMsg("$fullQuery", $fullQuery);
+        Logger::logWithMsg("fullQuery", $fullQuery);
 
         $dbResult = $this->db->query($fullQuery)->get();
         return array_values($this->parseDbProducts($dbResult));
@@ -368,7 +375,7 @@ class ProductModel extends Model {
                 $instancesIds[ $row->product ] = array();
             }
 
-            if(!array_key_exists($row->characteristic, $characteristicsIds[$row->product])) {
+            if(!array_key_exists($row->characteristic, $characteristicsIds[$row->product]) && $row->characteristic != 1) {
 
                 array_push( $result[ $row->product ]["characteristics"], array(
                     "id" => $row->characteristic,
