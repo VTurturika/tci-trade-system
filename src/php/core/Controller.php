@@ -15,6 +15,19 @@ class Controller {
         $container['CounterpartyController'] = function($c) { return new CounterpartyController($c); };
         $container['ProductController'] = function($c) { return new ProductController($c); };
         $container['TransactionController'] = function($c) { return new TransactionController($c); };
+        $container['AuthController'] = function($c) { return new AuthController($c); };
+
+        $this->app->add(new \Slim\Middleware\JwtAuthentication([
+            "secret" => "SECRET",
+            "path" => "/api",
+            "secure" => false,
+            "error" => function ($request, $response, $arguments) {
+                return $response->withJson(array(
+                    "status" => "error",
+                    "message" => $arguments["message"],
+                ));
+            }
+        ]));
     }
 
     public function route() {
@@ -47,6 +60,11 @@ class Controller {
         $this->app->post("/api/transaction/buy", \TransactionController::class . ":buy");
         $this->app->post("/api/transaction/sell", \TransactionController::class . ":sell");
         $this->app->post("/api/transaction/conduct/{id}", \TransactionController::class . ":conduct");
+
+        //auth routes
+        $this->app->post("/auth/login", \AuthController::class . ":login");
+        $this->app->post("/auth/password", \AuthController::class . ":password");
+        $this->app->post("/auth/refresh", \AuthController::class . ":refresh");
 
         $this->app->run();
     }
