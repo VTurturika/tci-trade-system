@@ -30,7 +30,9 @@ class AuthController {
 
     public function refresh(Request $request, Response $response) {
 
-        return $response->getBody()->write("get: Not implemented yet");
+        $parsedBody = $request->getParsedBody();
+        $responseResult = $this->model->refreshToken($parsedBody);
+        return $response->withJson($responseResult);
     }
 
 }
