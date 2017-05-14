@@ -8,7 +8,7 @@ class CharacteristicModel extends Model {
         Logger::logWithMsg("parsedBody ", $params);
 
         if($id != null) $charasteristicQuty = $this->db->table("Characteristic")->select("*")->where('id', '=', $id);
-        else $charasteristicQuty = $this->db->table("Characteristic")->select("*");
+        else $charasteristicQuty = $this->db->table("Characteristic")->select("*")->where('id', "!=", 1);
 
         return $charasteristicQuty->get();
     }

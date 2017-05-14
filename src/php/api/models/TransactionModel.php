@@ -62,12 +62,12 @@ class TransactionModel extends Model {
         if(array_key_exists("type", $params)) {
 
             $type = $params["type"];
-            $where .= "AND type = $type ";
+            $where .= "AND t.type = $type ";
         }
         if(array_key_exists("counterparty", $params)) {
 
             $counterparty = intval($params["counterparty"]);
-            $where .= "AND counterparty = $counterparty ";
+            $where .= "AND it.counterparty = $counterparty ";
         }
 
         $fullQuery = "$select $instanceJoin $transactionJoin $productJoin $where ".
